@@ -48,7 +48,7 @@ void main() {
       );
 
       // Список всех тем и вопросов
-      final themes = [theme1, theme2];
+      // final themes = [theme1, theme2];
       final questions = [question1, question2];
 
       // Фильтруем вопросы для каждой темы по themeId

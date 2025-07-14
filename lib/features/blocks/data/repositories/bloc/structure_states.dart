@@ -57,11 +57,6 @@ BlocEntity? getNextParent(BlocEntity? tempParent, BlocEntity tempChild) {
   return null;
 }
 
-String _generateId() {
-  return DateTime.now().millisecondsSinceEpoch.toString() +
-      (1000 + (DateTime.now().microsecond % 9000)).toString();
-}
-
 String getChildsTitle(BlocEntity? tempParent) {
   if (tempParent is PackEntity) {
     return 'Раунды';

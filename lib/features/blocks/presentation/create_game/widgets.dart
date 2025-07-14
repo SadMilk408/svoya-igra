@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:smartest_man/features/blocks/data/repositories/bloc/structure_bloc.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/structure_entity.dart';
 
 class FieldBlockName extends StatelessWidget {
@@ -225,7 +223,6 @@ Future<QuestionEntity?> showAddQuestionDialog(
   QuestionEntity? tempQuestion,
   bool Function(int cost)? isCostUnique,
 }) async {
-  print('XYI 444 ${parent?.toJson()}');
   final formKey = GlobalKey<FormState>();
   final costController = TextEditingController(
     text: '${tempQuestion?.cost ?? ''}',

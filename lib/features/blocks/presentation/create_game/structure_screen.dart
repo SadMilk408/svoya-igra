@@ -47,9 +47,6 @@ class StructureScreen extends StatelessWidget {
         child: BlocBuilder<GameStructureBloc, GameStructureState>(
           builder: (context, state) {
             final tempList = state.getChilds(parent);
-            log('XYI 4 ${state.gameStructure.toJson()}');
-            print('XYI 41 ${parent?.toJson()}');
-            // log('XYI 4 ${tempList.map((e) => e.toJson())}');
 
             return Padding(
               padding: const EdgeInsets.all(16.0),
@@ -360,8 +357,6 @@ class _AddButtonWidget extends StatelessWidget {
                     .where((q) => q.themeId == parent?.id)
                     .map((q) => q.cost)
                     .toSet();
-
-            print('XYI 555 ${parent?.toJson()}');
 
             result = await showAddQuestionDialog(
               context,
