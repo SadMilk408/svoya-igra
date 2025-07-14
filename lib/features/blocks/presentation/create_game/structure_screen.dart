@@ -47,6 +47,9 @@ class StructureScreen extends StatelessWidget {
         child: BlocBuilder<GameStructureBloc, GameStructureState>(
           builder: (context, state) {
             final tempList = state.getChilds(parent);
+            log('XYI 4 ${state.gameStructure.toJson()}');
+            print('XYI 41 ${parent?.toJson()}');
+            // log('XYI 4 ${tempList.map((e) => e.toJson())}');
 
             return Padding(
               padding: const EdgeInsets.all(16.0),
@@ -148,7 +151,7 @@ class BlockList extends StatelessWidget {
                         onTap: () async {
                           final nextParent = getNextParent(
                             parent,
-                            tempList[index].blockName,
+                            tempList[index],
                           );
 
                           if (nextParent != null) {
@@ -252,9 +255,7 @@ class EditButton extends StatelessWidget {
           final existingQuestions =
               state.gameStructure.questions
                   .where(
-                    (q) =>
-                        q.parentName == parent?.blockName &&
-                        q.id != tempChild?.id,
+                    (q) => q.themeId == parent?.id && q.id != tempChild?.id,
                   )
                   .map((q) => q.cost)
                   .toSet();
@@ -279,6 +280,7 @@ class EditButton extends StatelessWidget {
             parent: parent,
             initialText: tempChild?.blockName ?? '',
             isNameUnique: (name) => !existingNames.contains(name),
+            tempChild: tempChild,
           );
         }
 
@@ -355,9 +357,11 @@ class _AddButtonWidget extends StatelessWidget {
             final state = context.read<GameStructureBloc>().state;
             final existingQuestions =
                 state.gameStructure.questions
-                    .where((q) => q.parentName == parent?.blockName)
+                    .where((q) => q.themeId == parent?.id)
                     .map((q) => q.cost)
                     .toSet();
+
+            print('XYI 555 ${parent?.toJson()}');
 
             result = await showAddQuestionDialog(
               context,

@@ -112,7 +112,7 @@ class GameStructureBloc extends Bloc<GameStructureEvent, GameStructureState> {
     final existingQuestion = current.questions.any(
       (q) =>
           q.cost == event.question.cost &&
-          q.parentName == event.question.parentName &&
+          q.themeId == event.question.themeId &&
           q.id != event.question.id,
     );
 
@@ -207,8 +207,8 @@ class GameStructureBloc extends Bloc<GameStructureEvent, GameStructureState> {
 
     final updatedQuestions =
         questions.map((question) {
-          if (question.parentName == themes[index].blockName) {
-            return question.copyWithQuestion(parentName: event.theme.blockName);
+          if (question.themeId == themes[index].id) {
+            return question.copyWithQuestion(themeId: event.theme.id);
           }
           return question;
         }).toList();
@@ -266,7 +266,7 @@ class GameStructureBloc extends Bloc<GameStructureEvent, GameStructureState> {
       final q = entry.value;
       return i != index && // Исключаем редактируемый вопрос
           q.cost == event.question.cost &&
-          q.parentName == event.question.parentName;
+          q.themeId == event.question.themeId;
     });
 
     log('Existing question check: $existingQuestion');
@@ -315,15 +315,14 @@ class GameStructureBloc extends Bloc<GameStructureEvent, GameStructureState> {
             .toList();
 
     // Удаляем все вопросы, принадлежащие удаленным темам
-    final removedThemeNames =
+    final removedThemeIds =
         current.themes
             .where((t) => t.parentName == event.round.blockName)
-            .map((t) => t.blockName)
+            .map((t) => t.id)
             .toSet();
-
     final updatedQuestions =
         current.questions
-            .where((q) => !removedThemeNames.contains(q.parentName))
+            .where((q) => !removedThemeIds.contains(q.themeId))
             .toList();
 
     _repository.saveRounds(updatedRounds);
@@ -350,9 +349,7 @@ class GameStructureBloc extends Bloc<GameStructureEvent, GameStructureState> {
 
     // Удаляем все вопросы, принадлежащие этой теме
     final updatedQuestions =
-        current.questions
-            .where((q) => q.parentName != event.theme.blockName)
-            .toList();
+        current.questions.where((q) => q.themeId != event.theme.id).toList();
 
     _repository.saveThemes(updatedThemes);
     _repository.saveQuestions(updatedQuestions);
@@ -426,6 +423,7 @@ GameStructureEvent? chooseAddedEvent({
           parentName: newChild.parentName,
           blockName: newChild.blockName,
           cost: newChild.cost,
+          themeId: (newChild).themeId,
         ),
       );
     }
@@ -467,6 +465,7 @@ GameStructureEvent? chooseEditEvent({
           parentName: changedChild.parentName,
           blockName: changedChild.blockName,
           cost: changedChild.cost,
+          themeId: (changedChild).themeId,
         ),
         tempChild,
       );

@@ -135,6 +135,7 @@ final mockPack = BlockModel(
   name: 'Основной пак',
   parentName: 'Своя игра',
   blockType: BlockType.packs,
+  id: 'main_pack',
 );
 
 final mockRounds = [
@@ -142,16 +143,19 @@ final mockRounds = [
     name: 'Раунд 1',
     parentName: 'Основной пак',
     blockType: BlockType.rounds,
+    id: 'round_1',
   ),
   BlockModel(
     name: 'Раунд 2',
     parentName: 'Основной пак',
     blockType: BlockType.rounds,
+    id: 'round_2',
   ),
   BlockModel(
     name: 'Раунд 3',
     parentName: 'Основной пак',
     blockType: BlockType.rounds,
+    id: 'round_3',
   ),
 ];
 
@@ -160,23 +164,61 @@ final mockThemes = [
     name: 'Тема 1',
     parentName: 'Раунд 1',
     blockType: BlockType.themes,
+    id: 'theme_1',
   ),
   BlockModel(
     name: 'Тема 2',
     parentName: 'Раунд 1',
     blockType: BlockType.themes,
+    id: 'theme_2',
   ),
   BlockModel(
     name: 'Тема 3',
     parentName: 'Раунд 1',
     blockType: BlockType.themes,
+    id: 'theme_3',
   ),
 ];
 
 final mockQuestions = [
-  QuestionModel(parentName: 'Тема 1', price: 100, questionData: null),
-  QuestionModel(parentName: 'Тема 1', price: 200, questionData: null),
-  QuestionModel(parentName: 'Тема 1', price: 300, questionData: null),
-  QuestionModel(parentName: 'Тема 1', price: 400, questionData: null),
-  QuestionModel(parentName: 'Тема 1', price: 500, questionData: null),
+  QuestionModel(
+    parentName: 'Тема 1',
+    price: 100,
+    questionData: null,
+    themeId: 'Тема 1',
+    id: '1',
+    name: '1',
+  ),
+  QuestionModel(
+    parentName: 'Тема 1',
+    price: 200,
+    questionData: null,
+    themeId: 'Тема 1',
+    id: '2',
+    name: '2',
+  ),
+  QuestionModel(
+    parentName: 'Тема 1',
+    price: 300,
+    questionData: null,
+    themeId: 'Тема 1',
+    id: '3',
+    name: '3',
+  ),
+  QuestionModel(
+    parentName: 'Тема 1',
+    price: 400,
+    questionData: null,
+    themeId: 'Тема 1',
+    id: '4',
+    name: '4',
+  ),
+  QuestionModel(
+    parentName: 'Тема 1',
+    price: 500,
+    questionData: null,
+    themeId: 'Тема 1',
+    id: '5',
+    name: '5',
+  ),
 ];

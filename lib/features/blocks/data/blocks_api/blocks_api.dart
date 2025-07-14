@@ -22,16 +22,13 @@ class PacksApiImpl implements PacksApi {
   @override
   void saveBlocks(String blockName, List<BlockModel> blockModel) {
     final List<String> jsonList = blockModel.map((q) => q.toJson()).toList();
-
     _prefs.setStringList(blockName, jsonList);
   }
 
   @override
   List<BlockModel> getBlocks(String parentName) {
     final List<String>? jsonList = _prefs.getStringList(parentName);
-
     if (jsonList == null) return [];
-
     return jsonList.map((str) => BlockModel.fromJson(str)).toList();
   }
 

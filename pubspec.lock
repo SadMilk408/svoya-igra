@@ -37,10 +37,10 @@ packages:
     dependency: transitive
     description:
       name: audio_session
-      sha256: "8f96a7fecbb718cb093070f868b4cdcb8a9b1053dce342ff8ab2fde10eb9afb7"
+      sha256: "2b7fff16a552486d078bfc09a8cde19f426dc6d6329262b684182597bec5b1ac"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.2"
+    version: "0.1.25"
   bloc:
     dependency: transitive
     description:
@@ -328,6 +328,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  fullscreen_window:
+    dependency: transitive
+    description:
+      name: fullscreen_window
+      sha256: b3502f890a875de6cd300b06cfc542e089a324faef6c4fb5d5528f9e2ea68d8d
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   glob:
     dependency: transitive
     description:
@@ -420,10 +428,10 @@ packages:
     dependency: "direct main"
     description:
       name: just_audio
-      sha256: "679637a3ec5b6e00f36472f5a3663667df00ee4822cbf5dafca0f568c710960a"
+      sha256: f978d5b4ccea08f267dae0232ec5405c1b05d3f3cd63f82097ea46c015d5c09e
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.4"
+    version: "0.9.46"
   just_audio_platform_interface:
     dependency: transitive
     description:
@@ -440,6 +448,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.16"
+  just_audio_windows:
+    dependency: "direct main"
+    description:
+      name: just_audio_windows
+      sha256: b1ba5305d841c0e3883644e20fc11aaa23f28cfdd43ec20236d1e119a402ef29
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.2"
   leak_tracker:
     dependency: transitive
     description:
@@ -909,6 +925,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.7.2"
+  video_player_control_panel:
+    dependency: "direct main"
+    description:
+      name: video_player_control_panel
+      sha256: "84931a01d29aa3e43b35095b96692d92585217b32d8452ebe8fd2b4dbe51a4a0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.3"
   video_player_platform_interface:
     dependency: transitive
     description:
@@ -925,6 +949,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.5"
+  video_player_win:
+    dependency: "direct main"
+    description:
+      name: video_player_win
+      sha256: aac8b923e669fa9db69e59e2e2338a6923a4eab8d1e59ab489f68e2300d4ae94
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.0"
   vm_service:
     dependency: transitive
     description:

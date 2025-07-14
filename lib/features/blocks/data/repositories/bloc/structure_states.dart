@@ -32,25 +32,25 @@ class GameStructureInitial extends GameStructureState {
     }
     if (tempParent is ThemeEntity) {
       return gameStructure.questions
-          .where((e) => e.parentName == tempParent.blockName)
+          .where((e) => e.themeId == tempParent.id)
           .toList();
     }
     return [];
   }
 }
 
-BlocEntity? getNextParent(BlocEntity? tempParent, String blockName) {
+BlocEntity? getNextParent(BlocEntity? tempParent, BlocEntity tempChild) {
   if (tempParent is PackEntity) {
     return RoundEntity(
-      id: _generateId(),
-      blockName: blockName,
+      id: tempChild.id,
+      blockName: tempChild.blockName,
       parentName: tempParent.blockName,
     );
   }
   if (tempParent is RoundEntity) {
     return ThemeEntity(
-      id: _generateId(),
-      blockName: blockName,
+      id: tempChild.id,
+      blockName: tempChild.blockName,
       parentName: tempParent.blockName,
     );
   }
@@ -101,7 +101,7 @@ class GameStructureError extends GameStructureState {
     }
     if (tempParent is ThemeEntity) {
       return gameStructure.questions
-          .where((e) => e.parentName == tempParent.blockName)
+          .where((e) => e.themeId == tempParent.id)
           .toList();
     }
     return [];

@@ -3,8 +3,11 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  fullscreen_window
   irondash_engine_context
+  just_audio_windows
   super_native_extensions
+  video_player_win
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

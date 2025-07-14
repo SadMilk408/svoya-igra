@@ -36,13 +36,14 @@ class GameRow extends StatelessWidget {
         ...costs.map((cost) {
           // Ищем вопрос с данной ценой
           final question = questions.firstWhere(
-            (q) => q.cost == cost,
+            (q) => q.cost == cost && q.themeId == theme.id,
             orElse:
                 () => QuestionEntity(
                   id: '',
                   blockName: '',
                   parentName: theme.blockName,
                   cost: cost,
+                  themeId: theme.id,
                 ),
           );
 

@@ -183,10 +183,12 @@ class QuestionEntity extends BlocEntity with EquatableMixin {
     required super.blockName,
     required super.parentName,
     required this.cost,
+    required this.themeId,
     this.questionData,
   });
 
   final int cost;
+  final String themeId;
   final QuestionData? questionData;
 
   @override
@@ -194,6 +196,7 @@ class QuestionEntity extends BlocEntity with EquatableMixin {
     return {
       ...super.toMap(),
       'cost': cost,
+      'themeId': themeId,
       'questionData': questionData?.toMap(),
     };
   }
@@ -204,6 +207,7 @@ class QuestionEntity extends BlocEntity with EquatableMixin {
       blockName: map['blockName'] as String,
       parentName: map['parentName'] as String,
       cost: map['cost'] as int,
+      themeId: map['themeId'] as String? ?? '',
       questionData:
           map['questionData'] != null
               ? QuestionData.fromMap(
@@ -218,6 +222,7 @@ class QuestionEntity extends BlocEntity with EquatableMixin {
     String? parentName,
     String? blockName,
     int? cost,
+    String? themeId,
     QuestionData? questionData,
   }) {
     return QuestionEntity(
@@ -225,10 +230,18 @@ class QuestionEntity extends BlocEntity with EquatableMixin {
       parentName: parentName ?? super.parentName,
       blockName: blockName ?? super.blockName,
       cost: cost ?? this.cost,
+      themeId: themeId ?? this.themeId,
       questionData: questionData ?? this.questionData,
     );
   }
 
   @override
-  List<Object?> get props => [id, blockName, parentName, cost, questionData];
+  List<Object?> get props => [
+    id,
+    blockName,
+    parentName,
+    cost,
+    themeId,
+    questionData,
+  ];
 }

@@ -6,51 +6,68 @@ import 'package:smartest_man/features/blocks/data/repositories/entities/question
 
 class QuestionModel extends BlockModel {
   QuestionModel({
+    required super.id,
+    required super.name,
     required super.parentName,
-    super.blockType = BlockType.questions,
+    BlockType super.blockType = BlockType.questions,
     required this.questionData,
     required this.price,
-  }) : super(name: '$price');
+    required this.themeId,
+  });
 
   final QuestionData? questionData;
   final int price;
+  final String themeId;
 
   @override
   QuestionEntity toEntity() {
     return QuestionEntity(
-      id: _generateId(),
+      id: id,
       blockName: name,
       parentName: parentName,
       cost: price,
+      themeId: themeId,
       questionData: questionData,
     );
   }
 
-  String _generateId() {
-    return DateTime.now().millisecondsSinceEpoch.toString() +
-        (1000 + (DateTime.now().microsecond % 9000)).toString();
-  }
-
   factory QuestionModel.fromEntity(QuestionEntity questionEntity) {
     return QuestionModel(
+      id: questionEntity.id,
+      name: questionEntity.blockName,
       parentName: questionEntity.parentName,
+      blockType: BlockType.questions,
       questionData: questionEntity.questionData,
       price: questionEntity.cost,
+      themeId: questionEntity.themeId,
     );
   }
 
   @override
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
+      'id': id,
+      'name': name,
       'parentName': parentName,
+      'type': blockType?.name,
       'questionData': questionData?.toMap(),
       'price': price,
+      'themeId': themeId,
     };
   }
 
   factory QuestionModel.fromMap(Map<String, dynamic> map) {
+    final nameValue = map['name'];
+    final String name =
+        (nameValue is String && nameValue.isNotEmpty) ? nameValue : '';
     return QuestionModel(
+      id: map['id'] as String? ?? '',
+      name: name,
       parentName: map['parentName'] as String,
+      blockType:
+          map['type'] != null
+              ? BlockType.values.byName(map['type'])
+              : BlockType.questions,
       questionData:
           map['questionData'] != null
               ? QuestionData.fromMap(
@@ -58,6 +75,7 @@ class QuestionModel extends BlockModel {
               )
               : null,
       price: map['price'] as int,
+      themeId: map['themeId'] as String? ?? '',
     );
   }
 

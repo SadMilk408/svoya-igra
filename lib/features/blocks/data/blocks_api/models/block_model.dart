@@ -5,11 +5,13 @@ import 'package:smartest_man/features/blocks/data/repositories/entities/structur
 enum BlockType { packs, rounds, themes, questions }
 
 class BlockModel {
+  final String id;
   final String name;
   final String parentName;
   final BlockType? blockType;
 
   BlockModel({
+    required this.id,
     required this.name,
     required this.parentName,
     required this.blockType,
@@ -18,31 +20,14 @@ class BlockModel {
   BlocEntity? toEntity() {
     switch (blockType) {
       case BlockType.packs:
-        return PackEntity(
-          id: _generateId(),
-          blockName: name,
-          parentName: parentName,
-        );
+        return PackEntity(id: id, blockName: name, parentName: parentName);
       case BlockType.rounds:
-        return RoundEntity(
-          id: _generateId(),
-          blockName: name,
-          parentName: parentName,
-        );
+        return RoundEntity(id: id, blockName: name, parentName: parentName);
       case BlockType.themes:
-        return ThemeEntity(
-          id: _generateId(),
-          blockName: name,
-          parentName: parentName,
-        );
+        return ThemeEntity(id: id, blockName: name, parentName: parentName);
       default:
         return null;
     }
-  }
-
-  String _generateId() {
-    return DateTime.now().millisecondsSinceEpoch.toString() +
-        (1000 + (DateTime.now().microsecond % 9000)).toString();
   }
 
   factory BlockModel.fromEntity(BlocEntity blocEntity) {
@@ -59,6 +44,7 @@ class BlockModel {
     }
 
     return BlockModel(
+      id: blocEntity.id,
       name: blocEntity.blockName,
       parentName: blocEntity.parentName,
       blockType: type,
@@ -67,6 +53,7 @@ class BlockModel {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
+      'id': id,
       'name': name,
       'parentName': parentName,
       'type': blockType?.name,
@@ -75,6 +62,7 @@ class BlockModel {
 
   factory BlockModel.fromMap(Map<String, dynamic> map) {
     return BlockModel(
+      id: map['id'] as String? ?? '',
       name: map['name'],
       parentName: map['parentName'],
       blockType: BlockType.values.byName(map['type']),

@@ -56,8 +56,7 @@ class _GameBoardScreenState extends State<GameBoardScreen> {
     final questions =
         structureState.gameStructure.questions
             .where(
-              (question) =>
-                  themes.any((theme) => theme.blockName == question.parentName),
+              (question) => themes.any((theme) => theme.id == question.themeId),
             )
             .toList();
 

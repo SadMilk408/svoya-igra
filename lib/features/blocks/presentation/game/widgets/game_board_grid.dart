@@ -31,8 +31,8 @@ class GameBoardGrid extends StatelessWidget {
     // Группируем вопросы по темам
     final questionsByTheme = <String, List<QuestionEntity>>{};
     for (final theme in themes) {
-      questionsByTheme[theme.blockName] =
-          questions.where((q) => q.parentName == theme.blockName).toList();
+      questionsByTheme[theme.id] =
+          questions.where((q) => q.themeId == theme.id).toList();
     }
 
     // Собираем уникальные цены из всех вопросов
@@ -63,8 +63,7 @@ class GameBoardGrid extends StatelessWidget {
                 child: Column(
                   children: List.generate(themes.length, (themeIndex) {
                     final theme = themes[themeIndex];
-                    final themeQuestions =
-                        questionsByTheme[theme.blockName] ?? [];
+                    final themeQuestions = questionsByTheme[theme.id] ?? [];
 
                     return GameRow(
                       theme: theme,

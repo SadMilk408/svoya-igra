@@ -25,111 +25,6 @@ class FieldBlockName extends StatelessWidget {
   }
 }
 
-class AddButtonWidget extends StatelessWidget {
-  const AddButtonWidget({super.key, this.parent});
-
-  final BlocEntity? parent;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: 50,
-        height: 50,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.white, width: 2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () async {
-              BlocEntity? result;
-
-              if (parent is ThemeEntity) {
-                final state = context.read<GameStructureBloc>().state;
-                final existingQuestions =
-                    state.gameStructure.questions
-                        .where((q) => q.parentName == parent?.blockName)
-                        .map((q) => q.cost)
-                        .toSet();
-
-                result = await showAddQuestionDialog(
-                  context,
-                  parent: parent,
-                  isCostUnique: (cost) => !existingQuestions.contains(cost),
-                );
-              } else {
-                final state = context.read<GameStructureBloc>().state;
-                final existingNames =
-                    state.getChilds(parent).map((e) => e.blockName).toSet();
-
-                result = await showCustomInputDialog(
-                  parent: parent,
-                  context,
-                  isNameUnique: (name) => !existingNames.contains(name),
-                );
-              }
-
-              if (result != null) {
-                if (context.mounted) {
-                  final event = chooseAddedEvent(
-                    tempParent: parent,
-                    newChild: result,
-                  );
-
-                  if (event != null) {
-                    context.read<GameStructureBloc>().add(event);
-                  }
-                }
-              }
-            },
-            child: const Icon(Icons.add, color: Colors.white, size: 28),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class SaveButtonWidget extends StatelessWidget {
-  final VoidCallback? onPressed;
-
-  const SaveButtonWidget({super.key, this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: 160,
-        height: 80,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.white, width: 2),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onPressed,
-            child: const Center(
-              child: Text(
-                "Сохранить",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class CustomTextField extends StatelessWidget {
   const CustomTextField({
     super.key,
@@ -215,6 +110,7 @@ Future<BlocEntity?> showCustomInputDialog(
   String hintText = "Текст",
   String initialText = "",
   bool Function(String name)? isNameUnique,
+  BlocEntity? tempChild,
 }) {
   final textController = TextEditingController(text: initialText);
   final formKey = GlobalKey<FormState>();
@@ -278,9 +174,7 @@ Future<BlocEntity?> showCustomInputDialog(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+            onPressed: Navigator.of(context).pop,
             child: const Text("Отмена"),
           ),
           ElevatedButton(
@@ -294,13 +188,27 @@ Future<BlocEntity?> showCustomInputDialog(
             ),
             onPressed: () {
               if (formKey.currentState?.validate() ?? false) {
-                Navigator.of(context).pop(
-                  BlocEntity(
-                    id: _generateId(),
-                    blockName: textController.text,
-                    parentName: parent?.blockName ?? '',
-                  ),
-                );
+                if (parent is RoundEntity) {
+                  // Если tempChild есть и это ThemeEntity, сохраняем старый id
+                  final String themeId =
+                      (tempChild is ThemeEntity) ? tempChild.id : _generateId();
+                  Navigator.of(context).pop(
+                    ThemeEntity(
+                      id: themeId,
+                      blockName: textController.text,
+                      parentName: parent.blockName,
+                    ),
+                  );
+                } else {
+                  final String entityId = tempChild?.id ?? _generateId();
+                  Navigator.of(context).pop(
+                    BlocEntity(
+                      id: entityId,
+                      blockName: textController.text,
+                      parentName: parent?.blockName ?? '',
+                    ),
+                  );
+                }
               }
             },
             child: const Text("ОК"),
@@ -317,6 +225,7 @@ Future<QuestionEntity?> showAddQuestionDialog(
   QuestionEntity? tempQuestion,
   bool Function(int cost)? isCostUnique,
 }) async {
+  print('XYI 444 ${parent?.toJson()}');
   final formKey = GlobalKey<FormState>();
   final costController = TextEditingController(
     text: '${tempQuestion?.cost ?? ''}',
@@ -421,6 +330,7 @@ Future<QuestionEntity?> showAddQuestionDialog(
                   cost: cost,
                   blockName: '$cost',
                   parentName: parent?.blockName ?? '',
+                  themeId: parent?.id ?? '',
                 );
 
                 Navigator.of(context).pop(newQuestion);
