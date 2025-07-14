@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/movable_resizable_image_data.dart';
-import 'package:flutter/foundation.dart';
 
 class MovableResizableImageWidget extends StatefulWidget {
   final MovableResizableImageData data;

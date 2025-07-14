@@ -66,7 +66,7 @@ class QuestionCell extends StatelessWidget {
             letterSpacing: 1.5,
             shadows: [
               Shadow(
-                color: Colors.black.withOpacity(0.7),
+                color: Colors.black.withValues(alpha: 0.7),
                 offset: const Offset(2, 2),
                 blurRadius: 4,
               ),
