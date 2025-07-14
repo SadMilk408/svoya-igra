@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/question_data.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/movable_resizable_text_data.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/movable_resizable_image_data.dart';
-import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/movable_resizable_video_data.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/audio_player_data.dart';
 import 'package:video_player/video_player.dart';
 import 'package:just_audio/just_audio.dart';
 import 'dart:io';
+import 'package:smartest_man/features/blocks/presentation/create_game/edit_questions/widgets/movable_resizable_video.dart';
 
 class QuestionContentDisplay extends StatefulWidget {
   final QuestionTabData data;
@@ -20,9 +20,9 @@ class QuestionContentDisplay extends StatefulWidget {
 class _QuestionContentDisplayState extends State<QuestionContentDisplay> {
   VideoPlayerController? _videoController;
   AudioPlayer? _audioPlayer;
-  bool _isVideoPlaying = false;
+  // bool _isVideoPlaying = false;
   bool _isAudioPlaying = false;
-  Duration _videoPosition = Duration.zero;
+  // Duration _videoPosition = Duration.zero;
   Duration _audioPosition = Duration.zero;
 
   @override
@@ -38,16 +38,16 @@ class _QuestionContentDisplayState extends State<QuestionContentDisplay> {
     super.dispose();
   }
 
-  double _calculateVideoProgress(MovableResizableVideoData videoData) {
-    final intervalDuration = videoData.endPosition - videoData.startPosition;
-    if (intervalDuration.inMilliseconds <= 0) return 0.0;
+  // double _calculateVideoProgress(MovableResizableVideoData videoData) {
+  //   final intervalDuration = videoData.endPosition - videoData.startPosition;
+  //   if (intervalDuration.inMilliseconds <= 0) return 0.0;
 
-    final currentProgress = _videoPosition - videoData.startPosition;
-    if (currentProgress.inMilliseconds <= 0) return 0.0;
+  //   final currentProgress = _videoPosition - videoData.startPosition;
+  //   if (currentProgress.inMilliseconds <= 0) return 0.0;
 
-    return (currentProgress.inMilliseconds / intervalDuration.inMilliseconds)
-        .clamp(0.0, 1.0);
-  }
+  //   return (currentProgress.inMilliseconds / intervalDuration.inMilliseconds)
+  //       .clamp(0.0, 1.0);
+  // }
 
   double _calculateAudioProgress(AudioPlayerData audioData) {
     final intervalDuration = audioData.endPosition - audioData.startPosition;
@@ -109,8 +109,8 @@ class _QuestionContentDisplayState extends State<QuestionContentDisplay> {
               _videoController!.addListener(() {
                 if (mounted) {
                   setState(() {
-                    _videoPosition = _videoController!.value.position;
-                    _isVideoPlaying = _videoController!.value.isPlaying;
+                    // _videoPosition = _videoController!.value.position;
+                    // _isVideoPlaying = _videoController!.value.isPlaying;
                   });
                 }
               });
@@ -164,7 +164,11 @@ class _QuestionContentDisplayState extends State<QuestionContentDisplay> {
         // Изображение
         if (widget.data.image != null) _buildImageWidget(widget.data.image!),
         // Видео
-        if (widget.data.video != null) _buildVideoWidget(widget.data.video!),
+        if (widget.data.video != null)
+          MovableResizableVideoWidget(
+            data: widget.data.video!,
+            settings: false,
+          ),
         // Аудио
         if (widget.data.audio != null) _buildAudioWidget(widget.data.audio!),
       ],
@@ -244,117 +248,6 @@ class _QuestionContentDisplayState extends State<QuestionContentDisplay> {
               textAlign: TextAlign.center,
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildVideoWidget(MovableResizableVideoData videoData) {
-    return Positioned(
-      left: videoData.position.dx,
-      top: videoData.position.dy,
-      child: Container(
-        width: videoData.size,
-        height: videoData.size,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.3),
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Stack(
-            children: [
-              if (_videoController != null &&
-                  _videoController!.value.isInitialized)
-                GestureDetector(
-                  onTap: () {
-                    if (_videoController != null) {
-                      if (_isVideoPlaying) {
-                        _videoController!.pause();
-                      } else {
-                        if (_videoPosition < videoData.startPosition) {
-                          _videoController!.seekTo(videoData.startPosition);
-                        }
-                        _videoController!.play();
-                        _videoController!.addListener(() {
-                          if (_videoController!.value.position >=
-                              videoData.endPosition) {
-                            _videoController!.pause();
-                            _videoController!.seekTo(videoData.startPosition);
-                          }
-                        });
-                      }
-                    }
-                  },
-                  child: VideoPlayer(_videoController!),
-                )
-              else if (_videoController == null)
-                Container(
-                  color: Colors.red.withValues(alpha: 0.3),
-                  child: const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.error_outline, color: Colors.red, size: 32),
-                        SizedBox(height: 8),
-                        Text(
-                          'Ошибка загрузки видео',
-                          style: TextStyle(color: Colors.red),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              else
-                Container(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  child: const Center(
-                    child: CircularProgressIndicator(color: Colors.white),
-                  ),
-                ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.5),
-                  ),
-                  child: LinearProgressIndicator(
-                    value: _calculateVideoProgress(videoData),
-                    backgroundColor: Colors.transparent,
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-              if (_videoController != null &&
-                  _videoController!.value.isInitialized &&
-                  !_isVideoPlaying)
-                Center(
-                  child: IgnorePointer(
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.6),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.play_arrow,
-                        color: Colors.white,
-                        size: 32,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
         ),
       ),
     );

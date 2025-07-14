@@ -92,7 +92,10 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
           children: [
             ElevatedButton(
               onPressed: _pickImage,
-              child: const Text('Выбрать картинку'),
+              child: const Text(
+                'Выбрать картинку',
+                style: TextStyle(color: Colors.amber),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(

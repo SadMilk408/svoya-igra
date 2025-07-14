@@ -28,7 +28,10 @@ class AudioPickerWidget extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () => _pickAudioFile(context),
-                  child: const Text('Выбрать аудио'),
+                  child: const Text(
+                    'Выбрать аудио',
+                    style: TextStyle(color: Colors.amber),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 const Expanded(

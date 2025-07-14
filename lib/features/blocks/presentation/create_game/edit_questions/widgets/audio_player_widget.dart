@@ -94,7 +94,10 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
               children: [
                 ElevatedButton(
                   onPressed: _pickFile,
-                  child: const Text('Выбрать аудио'),
+                  child: const Text(
+                    'Выбрать аудио',
+                    style: TextStyle(color: Colors.amber),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

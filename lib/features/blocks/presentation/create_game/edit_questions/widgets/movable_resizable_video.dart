@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:video_player/video_player.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/movable_resizable_video_data.dart';
 
@@ -8,12 +7,14 @@ class MovableResizableVideoWidget extends StatefulWidget {
   final MovableResizableVideoData data;
   final void Function(MovableResizableVideoData data)? onDone;
   final VoidCallback? onDelete;
+  final bool settings;
 
   const MovableResizableVideoWidget({
     super.key,
     required this.data,
     this.onDone,
     this.onDelete,
+    this.settings = true,
   });
 
   @override
@@ -207,190 +208,316 @@ class _MovableResizableVideoWidgetState
 
             return AlertDialog(
               title: const Text('Настройки времени видео'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (videoDuration != null) ...[
-                    // Начальная позиция
-                    Row(
-                      children: [
-                        const Text('Старт:'),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: SizedBox(
-                            height: 100,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: CupertinoPicker(
-                                    scrollController:
-                                        FixedExtentScrollController(
-                                          initialItem: selectedStartMinute,
-                                        ),
-                                    itemExtent: 32,
-                                    onSelectedItemChanged: (index) {
-                                      setStateDialog(() {
-                                        selectedStartMinute = index;
-                                        // сброс секунд если нужно
-                                        if (selectedStartSecond >
-                                            getMaxStartSecond()) {
-                                          selectedStartSecond =
-                                              getMaxStartSecond();
-                                        }
-                                        tempStartPosition = Duration(
-                                          minutes: selectedStartMinute,
-                                          seconds: selectedStartSecond,
-                                        );
-                                      });
-                                    },
-                                    children: List.generate(
-                                      maxMinute + 1,
-                                      (i) => Center(
-                                        child: Text(
-                                          i.toString().padLeft(2, '0'),
-                                        ),
-                                      ),
-                                    ),
+              content: SizedBox(
+                width: 400,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (videoDuration != null) ...[
+                      // Начальная позиция
+                      Row(
+                        children: [
+                          const Text('Старт:'),
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 120,
+                            height: 60,
+                            child: TextFormField(
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                              ),
+                              cursorColor: Colors.white,
+                              initialValue: selectedStartMinute.toString(),
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: 'мин',
+                                labelStyle: const TextStyle(
+                                  color: Colors.white70,
+                                ),
+                                filled: true,
+                                fillColor: Colors.black.withValues(alpha: 0.7),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    width: 2.0,
                                   ),
                                 ),
-                                const Text(':'),
-                                Expanded(
-                                  child: CupertinoPicker(
-                                    scrollController:
-                                        FixedExtentScrollController(
-                                          initialItem: selectedStartSecond,
-                                        ),
-                                    itemExtent: 32,
-                                    onSelectedItemChanged: (index) {
-                                      setStateDialog(() {
-                                        selectedStartSecond = index;
-                                        tempStartPosition = Duration(
-                                          minutes: selectedStartMinute,
-                                          seconds: selectedStartSecond,
-                                        );
-                                      });
-                                    },
-                                    children: List.generate(
-                                      getMaxStartSecond() + 1,
-                                      (i) => Center(
-                                        child: Text(
-                                          i.toString().padLeft(2, '0'),
-                                        ),
-                                      ),
-                                    ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    width: 2.0,
                                   ),
                                 ),
-                              ],
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.yellow,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 12.0,
+                                  horizontal: 16.0,
+                                ),
+                              ),
+                              onChanged: (v) {
+                                final val = int.tryParse(v) ?? 0;
+                                setStateDialog(() {
+                                  selectedStartMinute = val.clamp(0, maxMinute);
+                                  if (selectedStartSecond >
+                                      getMaxStartSecond()) {
+                                    selectedStartSecond = getMaxStartSecond();
+                                  }
+                                  tempStartPosition = Duration(
+                                    minutes: selectedStartMinute,
+                                    seconds: selectedStartSecond,
+                                  );
+                                });
+                              },
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8),
-                          child: Text(
-                            '/ ${videoDuration.inMinutes.toString().padLeft(2, '0')}:${(videoDuration.inSeconds % 60).toString().padLeft(2, '0')}',
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    // Конечная позиция
-                    Row(
-                      children: [
-                        const Text('Стоп:'),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: SizedBox(
-                            height: 100,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: CupertinoPicker(
-                                    scrollController:
-                                        FixedExtentScrollController(
-                                          initialItem: selectedEndMinute,
-                                        ),
-                                    itemExtent: 32,
-                                    onSelectedItemChanged: (index) {
-                                      setStateDialog(() {
-                                        selectedEndMinute = index;
-                                        if (selectedEndSecond >
-                                            getMaxEndSecond()) {
-                                          selectedEndSecond = getMaxEndSecond();
-                                        }
-                                        tempEndPosition = Duration(
-                                          minutes: selectedEndMinute,
-                                          seconds: selectedEndSecond,
-                                        );
-                                      });
-                                    },
-                                    children: List.generate(
-                                      maxMinute + 1,
-                                      (i) => Center(
-                                        child: Text(
-                                          i.toString().padLeft(2, '0'),
-                                        ),
-                                      ),
-                                    ),
+                          const Text(':'),
+                          SizedBox(
+                            width: 120,
+                            height: 60,
+                            child: TextFormField(
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                              ),
+                              cursorColor: Colors.white,
+                              initialValue: selectedStartSecond.toString(),
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: 'сек',
+                                labelStyle: const TextStyle(
+                                  color: Colors.white70,
+                                ),
+                                filled: true,
+                                fillColor: Colors.black.withValues(alpha: 0.7),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    width: 2.0,
                                   ),
                                 ),
-                                const Text(':'),
-                                Expanded(
-                                  child: CupertinoPicker(
-                                    scrollController:
-                                        FixedExtentScrollController(
-                                          initialItem: selectedEndSecond,
-                                        ),
-                                    itemExtent: 32,
-                                    onSelectedItemChanged: (index) {
-                                      setStateDialog(() {
-                                        selectedEndSecond = index;
-                                        tempEndPosition = Duration(
-                                          minutes: selectedEndMinute,
-                                          seconds: selectedEndSecond,
-                                        );
-                                      });
-                                    },
-                                    children: List.generate(
-                                      getMaxEndSecond() + 1,
-                                      (i) => Center(
-                                        child: Text(
-                                          i.toString().padLeft(2, '0'),
-                                        ),
-                                      ),
-                                    ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    width: 2.0,
                                   ),
                                 ),
-                              ],
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.yellow,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 12.0,
+                                  horizontal: 16.0,
+                                ),
+                              ),
+                              onChanged: (v) {
+                                final val = int.tryParse(v) ?? 0;
+                                setStateDialog(() {
+                                  selectedStartSecond = val.clamp(
+                                    0,
+                                    getMaxStartSecond(),
+                                  );
+                                  tempStartPosition = Duration(
+                                    minutes: selectedStartMinute,
+                                    seconds: selectedStartSecond,
+                                  );
+                                });
+                              },
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8),
-                          child: Text(
-                            '/ ${videoDuration.inMinutes.toString().padLeft(2, '0')}:${(videoDuration.inSeconds % 60).toString().padLeft(2, '0')}',
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: Text(
+                              '/ ${videoDuration.inMinutes.toString().padLeft(2, '0')}:${(videoDuration.inSeconds) % 60}'
+                                  .padLeft(2, '0'),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    if (warning != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          warning,
-                          style: const TextStyle(color: Colors.red),
-                        ),
+                        ],
                       ),
+                      const SizedBox(height: 8),
+                      // Конечная позиция
+                      Row(
+                        children: [
+                          const Text('Конец:'),
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 120,
+                            height: 60,
+                            child: TextFormField(
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                              ),
+                              cursorColor: Colors.white,
+                              initialValue: selectedEndMinute.toString(),
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: 'мин',
+                                labelStyle: const TextStyle(
+                                  color: Colors.white70,
+                                ),
+                                filled: true,
+                                fillColor: Colors.black.withValues(alpha: 0.7),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.yellow,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 12.0,
+                                  horizontal: 16.0,
+                                ),
+                              ),
+                              onChanged: (v) {
+                                final val = int.tryParse(v) ?? 0;
+                                setStateDialog(() {
+                                  selectedEndMinute = val.clamp(0, maxMinute);
+                                  if (selectedEndSecond > getMaxEndSecond()) {
+                                    selectedEndSecond = getMaxEndSecond();
+                                  }
+                                  tempEndPosition = Duration(
+                                    minutes: selectedEndMinute,
+                                    seconds: selectedEndSecond,
+                                  );
+                                });
+                              },
+                            ),
+                          ),
+                          const Text(':'),
+                          SizedBox(
+                            width: 120,
+                            height: 60,
+                            child: TextFormField(
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                              ),
+                              cursorColor: Colors.white,
+                              initialValue: selectedEndSecond.toString(),
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: 'сек',
+                                labelStyle: const TextStyle(
+                                  color: Colors.white70,
+                                ),
+                                filled: true,
+                                fillColor: Colors.black.withValues(alpha: 0.7),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.white,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: const BorderSide(
+                                    color: Colors.yellow,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 12.0,
+                                  horizontal: 16.0,
+                                ),
+                              ),
+                              onChanged: (v) {
+                                final val = int.tryParse(v) ?? 0;
+                                setStateDialog(() {
+                                  selectedEndSecond = val.clamp(
+                                    0,
+                                    getMaxEndSecond(),
+                                  );
+                                  tempEndPosition = Duration(
+                                    minutes: selectedEndMinute,
+                                    seconds: selectedEndSecond,
+                                  );
+                                });
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: Text(
+                              '/ ${videoDuration.inMinutes.toString().padLeft(2, '0')}:${(videoDuration.inSeconds) % 60}'
+                                  .padLeft(2, '0'),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (warning != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            warning,
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ),
+                    ],
                   ],
-                ],
+                ),
               ),
               actions: [
                 TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    side: const BorderSide(color: Colors.black, width: 1),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                   child: const Text('Отмена'),
                 ),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    side: const BorderSide(color: Colors.black, width: 1),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                  ),
                   onPressed:
                       tempStartPosition >= tempEndPosition
                           ? null
@@ -481,83 +608,85 @@ class _MovableResizableVideoWidgetState
               ],
             ),
           ),
-          // Move handle (top-left)
-          Positioned(
-            left: 0,
-            top: 0,
-            child: GestureDetector(
-              behavior: HitTestBehavior.deferToChild,
-              onPanUpdate: _onMoveDrag,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.7),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.open_with, color: Colors.white),
-              ),
-            ),
-          ),
-          // Resize handle (bottom-right)
-          Positioned(
-            right: 0,
-            bottom: 0,
-            child: GestureDetector(
-              behavior: HitTestBehavior.deferToChild,
-              onPanUpdate: _onResizeDrag,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.7),
-                  shape: BoxShape.circle,
-                ),
-                child: RotatedBox(
-                  quarterTurns: 1,
-                  child: const Icon(Icons.open_in_full, color: Colors.white),
-                ),
-              ),
-            ),
-          ),
-          // Delete handle (top-right)
-          if (widget.onDelete != null)
+          if (widget.settings) ...[
+            // Move handle (top-left)
             Positioned(
-              right: 0,
+              left: 0,
               top: 0,
               child: GestureDetector(
-                onTap: widget.onDelete,
+                behavior: HitTestBehavior.deferToChild,
+                onPanUpdate: _onMoveDrag,
                 child: Container(
                   width: 30,
                   height: 30,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.7),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    Icons.close,
+                  child: const Icon(Icons.open_with, color: Colors.white),
+                ),
+              ),
+            ),
+            // Resize handle (bottom-right)
+            Positioned(
+              right: 0,
+              bottom: 0,
+              child: GestureDetector(
+                behavior: HitTestBehavior.deferToChild,
+                onPanUpdate: _onResizeDrag,
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.7),
+                    shape: BoxShape.circle,
+                  ),
+                  child: RotatedBox(
+                    quarterTurns: 1,
+                    child: const Icon(Icons.open_in_full, color: Colors.white),
                   ),
                 ),
               ),
             ),
-          // Settings handle (bottom-left)
-          Positioned(
-            left: 0,
-            bottom: 0,
-            child: GestureDetector(
-              onTap: _showVideoSettingsDialog,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.7),
-                  shape: BoxShape.circle,
+            // Delete handle (top-right)
+            if (widget.onDelete != null)
+              Positioned(
+                right: 0,
+                top: 0,
+                child: GestureDetector(
+                  onTap: widget.onDelete,
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.black.withValues(alpha: 0.7),
+                    ),
+                  ),
                 ),
-                child: const Icon(Icons.settings, color: Colors.white),
+              ),
+            // Settings handle (bottom-left)
+            Positioned(
+              left: 0,
+              bottom: 0,
+              child: GestureDetector(
+                onTap: _showVideoSettingsDialog,
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.7),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.settings, color: Colors.white),
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );

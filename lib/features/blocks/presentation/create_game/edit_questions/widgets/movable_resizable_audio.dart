@@ -304,7 +304,7 @@ class _AudioSettingsDialogState extends State<AudioSettingsDialog> {
     return AlertDialog(
       title: const Text('Настройки аудио'),
       content: SizedBox(
-        width: 300,
+        width: 400,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -328,52 +328,239 @@ class _AudioSettingsDialogState extends State<AudioSettingsDialog> {
             ),
             const SizedBox(height: 16),
             if (_audioDuration != null) ...[
-              TimePickerRow(
-                label: 'Старт:',
-                maxMinute: _audioDuration!.inMinutes,
-                maxSecond: getMaxStartSecond(),
-                selectedMinute: _selectedStartMinute,
-                selectedSecond: _selectedStartSecond,
-                onMinuteChanged: (index) {
-                  setState(() {
-                    _selectedStartMinute = index;
-                    if (_selectedStartSecond > getMaxStartSecond()) {
-                      _selectedStartSecond = getMaxStartSecond();
-                    }
-                    _validateWarning();
-                  });
-                },
-                onSecondChanged: (index) {
-                  setState(() {
-                    _selectedStartSecond = index;
-                    _validateWarning();
-                  });
-                },
-                audioDuration: _audioDuration,
+              Row(
+                children: [
+                  const Text('Старт:'),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    width: 120,
+                    height: 60,
+                    child: TextFormField(
+                      initialValue: _selectedStartMinute.toString(),
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: Colors.white, fontSize: 22),
+                      cursorColor: Colors.white,
+                      decoration: InputDecoration(
+                        labelText: 'мин',
+                        labelStyle: const TextStyle(color: Colors.white70),
+                        filled: true,
+                        fillColor: Colors.black.withValues(alpha: 0.7),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                            color: Colors.white,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                            color: Colors.white,
+                            width: 2.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                            color: Colors.yellow,
+                            width: 2.0,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12.0,
+                          horizontal: 16.0,
+                        ),
+                      ),
+                      onChanged: (v) {
+                        final val = int.tryParse(v) ?? 0;
+                        setState(() {
+                          _selectedStartMinute = val.clamp(
+                            0,
+                            _audioDuration!.inMinutes,
+                          );
+                          if (_selectedStartSecond > getMaxStartSecond()) {
+                            _selectedStartSecond = getMaxStartSecond();
+                          }
+                          _validateWarning();
+                        });
+                      },
+                    ),
+                  ),
+                  const Text(':'),
+                  SizedBox(
+                    width: 120,
+                    height: 60,
+                    child: TextFormField(
+                      initialValue: _selectedStartSecond.toString(),
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: Colors.white, fontSize: 22),
+                      cursorColor: Colors.white,
+                      decoration: InputDecoration(
+                        labelText: 'сек',
+                        labelStyle: const TextStyle(color: Colors.white70),
+                        filled: true,
+                        fillColor: Colors.black.withValues(alpha: 0.7),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                            color: Colors.white,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                            color: Colors.white,
+                            width: 2.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                            color: Colors.yellow,
+                            width: 2.0,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12.0,
+                          horizontal: 16.0,
+                        ),
+                      ),
+                      onChanged: (v) {
+                        final val = int.tryParse(v) ?? 0;
+                        setState(() {
+                          _selectedStartSecond = val.clamp(
+                            0,
+                            getMaxStartSecond(),
+                          );
+                          _validateWarning();
+                        });
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Text(
+                      '/ ${_audioDuration!.inMinutes.toString().padLeft(2, '0')}:${(_audioDuration!.inSeconds % 60).toString().padLeft(2, '0')}',
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
-              TimePickerRow(
-                label: 'Стоп:',
-                maxMinute: _audioDuration!.inMinutes,
-                maxSecond: getMaxEndSecond(),
-                selectedMinute: _selectedEndMinute,
-                selectedSecond: _selectedEndSecond,
-                onMinuteChanged: (index) {
-                  setState(() {
-                    _selectedEndMinute = index;
-                    if (_selectedEndSecond > getMaxEndSecond()) {
-                      _selectedEndSecond = getMaxEndSecond();
-                    }
-                    _validateWarning();
-                  });
-                },
-                onSecondChanged: (index) {
-                  setState(() {
-                    _selectedEndSecond = index;
-                    _validateWarning();
-                  });
-                },
-                audioDuration: _audioDuration,
+              Row(
+                children: [
+                  const Text('Конец:'),
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    width: 120,
+                    height: 60,
+                    child: TextFormField(
+                      initialValue: _selectedEndMinute.toString(),
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: Colors.white, fontSize: 22),
+                      cursorColor: Colors.white,
+                      decoration: InputDecoration(
+                        labelText: 'мин',
+                        labelStyle: const TextStyle(color: Colors.white70),
+                        filled: true,
+                        fillColor: Colors.black.withValues(alpha: 0.7),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                            color: Colors.white,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                            color: Colors.white,
+                            width: 2.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                            color: Colors.yellow,
+                            width: 2.0,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12.0,
+                          horizontal: 16.0,
+                        ),
+                      ),
+                      onChanged: (v) {
+                        final val = int.tryParse(v) ?? 0;
+                        setState(() {
+                          _selectedEndMinute = val.clamp(
+                            0,
+                            _audioDuration!.inMinutes,
+                          );
+                          if (_selectedEndSecond > getMaxEndSecond()) {
+                            _selectedEndSecond = getMaxEndSecond();
+                          }
+                          _validateWarning();
+                        });
+                      },
+                    ),
+                  ),
+                  const Text(':'),
+                  SizedBox(
+                    width: 120,
+                    height: 60,
+                    child: TextFormField(
+                      initialValue: _selectedEndSecond.toString(),
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: Colors.white, fontSize: 22),
+                      cursorColor: Colors.white,
+                      decoration: InputDecoration(
+                        labelText: 'сек',
+                        labelStyle: const TextStyle(color: Colors.white70),
+                        filled: true,
+                        fillColor: Colors.black.withValues(alpha: 0.7),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                            color: Colors.white,
+                            width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                            color: Colors.white,
+                            width: 2.0,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(
+                            color: Colors.yellow,
+                            width: 2.0,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12.0,
+                          horizontal: 16.0,
+                        ),
+                      ),
+                      onChanged: (v) {
+                        final val = int.tryParse(v) ?? 0;
+                        setState(() {
+                          _selectedEndSecond = val.clamp(0, getMaxEndSecond());
+                          _validateWarning();
+                        });
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Text(
+                      '/ ${_audioDuration!.inMinutes.toString().padLeft(2, '0')}:${(_audioDuration!.inSeconds % 60).toString().padLeft(2, '0')}',
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               if (_warning != null)
@@ -391,10 +578,22 @@ class _AudioSettingsDialogState extends State<AudioSettingsDialog> {
       ),
       actions: [
         TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            side: const BorderSide(color: Colors.black, width: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          ),
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Отмена'),
         ),
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            side: const BorderSide(color: Colors.black, width: 1),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          ),
           onPressed:
               _warning == null
                   ? () {

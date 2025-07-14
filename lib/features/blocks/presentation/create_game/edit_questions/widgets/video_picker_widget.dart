@@ -104,7 +104,10 @@ class _VideoPickerWidgetState extends State<VideoPickerWidget> {
           children: [
             ElevatedButton(
               onPressed: _pickVideo,
-              child: const Text('Выбрать видео'),
+              child: const Text(
+                'Выбрать видео',
+                style: TextStyle(color: Colors.amber),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
