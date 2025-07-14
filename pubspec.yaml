@@ -1,0 +1,36 @@
+name: smartest_man
+description: "A new Flutter project."
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  flutter_bloc: ^9.1.0
+  equatable: ^2.0.7
+  shared_preferences: ^2.5.3
+  mockito: ^5.4.6
+  super_drag_and_drop: ^0.9.1
+  dotted_border: ^2.1.0
+  just_audio: ^0.10.0
+  file_picker: ^10.0.0
+  video_player: ^2.10.0
+  path_provider: ^2.1.5
+  path: ^1.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.8
+
+flutter:
+  uses-material-design: true
