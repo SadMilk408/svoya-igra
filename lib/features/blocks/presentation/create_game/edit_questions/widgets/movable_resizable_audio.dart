@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -8,12 +9,14 @@ class MovableResizableAudioWidget extends StatefulWidget {
   final AudioPlayerData data;
   final void Function(AudioPlayerData data)? onDone;
   final VoidCallback? onDelete;
+  final bool settings;
 
   const MovableResizableAudioWidget({
     super.key,
     required this.data,
     this.onDone,
     this.onDelete,
+    this.settings = true,
   });
 
   @override
@@ -25,6 +28,7 @@ class _MovableResizableAudioWidgetState
     extends State<MovableResizableAudioWidget> {
   final AudioPlayer _player = AudioPlayer();
   bool _isPlaying = false;
+  StreamSubscription<Duration>? _positionSub;
 
   @override
   void initState() {
@@ -34,6 +38,7 @@ class _MovableResizableAudioWidgetState
 
   @override
   void dispose() {
+    _positionSub?.cancel();
     _player.dispose();
     super.dispose();
   }
@@ -76,6 +81,7 @@ class _MovableResizableAudioWidgetState
 
     if (_isPlaying) {
       await _player.stop();
+      _positionSub?.cancel();
       setState(() {
         _isPlaying = false;
       });
@@ -85,12 +91,22 @@ class _MovableResizableAudioWidgetState
       });
       try {
         await _player.seek(widget.data.startPosition);
-        await _player.setClip(
-          start: widget.data.startPosition,
-          end: widget.data.endPosition,
-        );
+        _positionSub?.cancel();
+        _positionSub = _player.positionStream.listen((pos) async {
+          if (pos >= widget.data.endPosition) {
+            await _player.pause();
+            await _player.seek(widget.data.startPosition);
+            _positionSub?.cancel();
+            if (mounted) {
+              setState(() {
+                _isPlaying = false;
+              });
+            }
+          }
+        });
         await _player.play();
       } catch (e) {
+        _positionSub?.cancel();
         setState(() {
           _isPlaying = false;
         });
@@ -152,54 +168,57 @@ class _MovableResizableAudioWidgetState
                         color: Colors.white,
                       ),
                     ),
-                    IconButton(
-                      onPressed: _showSettingsDialog,
-                      icon: const Icon(Icons.settings, color: Colors.white),
-                    ),
+                    if (widget.settings)
+                      IconButton(
+                        onPressed: _showSettingsDialog,
+                        icon: const Icon(Icons.settings, color: Colors.white),
+                      ),
                   ],
                 ),
               ],
             ),
           ),
           // Move handle (top-left)
-          Positioned(
-            left: 0,
-            top: 0,
-            child: GestureDetector(
-              behavior: HitTestBehavior.deferToChild,
-              onPanUpdate: _onMoveDrag,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.7),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.open_with, color: Colors.white),
-              ),
-            ),
-          ),
-          // Delete handle (top-right)
-          if (widget.onDelete != null)
+          if (widget.settings) ...[
             Positioned(
-              right: 0,
+              left: 0,
               top: 0,
               child: GestureDetector(
-                onTap: widget.onDelete,
+                behavior: HitTestBehavior.deferToChild,
+                onPanUpdate: _onMoveDrag,
                 child: Container(
                   width: 30,
                   height: 30,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.7),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    Icons.close,
-                    color: Colors.black.withValues(alpha: 0.7),
-                  ),
+                  child: const Icon(Icons.open_with, color: Colors.white),
                 ),
               ),
             ),
+            // Delete handle (top-right)
+            if (widget.onDelete != null)
+              Positioned(
+                right: 0,
+                top: 0,
+                child: GestureDetector(
+                  onTap: widget.onDelete,
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.black.withValues(alpha: 0.7),
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ],
       ),
     );
