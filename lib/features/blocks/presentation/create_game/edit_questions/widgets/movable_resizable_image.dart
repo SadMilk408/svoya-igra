@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/movable_resizable_image_data.dart';
 
 class MovableResizableImageWidget extends StatefulWidget {
@@ -53,17 +54,27 @@ class _MovableResizableImageWidgetState
 
   Widget _buildImageWidget() {
     try {
-      final file = File(widget.data.imagePath);
-      if (!file.existsSync()) {
-        return _buildErrorWidget('Файл изображения не найден');
+      if (kIsWeb && widget.data.imagePath.startsWith('assets/')) {
+        return Image.asset(
+          widget.data.imagePath,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildErrorWidget('Ошибка загрузки изображения');
+          },
+        );
+      } else {
+        final file = File(widget.data.imagePath);
+        if (!file.existsSync()) {
+          return _buildErrorWidget('Файл изображения не найден');
+        }
+        return Image.file(
+          file,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildErrorWidget('Ошибка загрузки изображения');
+          },
+        );
       }
-      return Image.file(
-        file,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          return _buildErrorWidget('Ошибка загрузки изображения');
-        },
-      );
     } catch (e) {
       return _buildErrorWidget('Ошибка при открытии изображения');
     }
