@@ -12,7 +12,6 @@ import 'widgets/movable_resizable_video.dart';
 import 'widgets/movable_resizable_image.dart';
 import 'widgets/movable_resizable_audio.dart';
 import 'widgets/audio_picker_widget.dart';
-import 'dart:developer';
 
 class EditQuestion extends StatelessWidget {
   const EditQuestion({super.key, required this.tempChild});
@@ -54,52 +53,39 @@ class _EditQuestionContentState extends State<_EditQuestionContent>
     super.dispose();
   }
 
-  void _onSave() {
+  void _onSaveAndGoBack() {
     if (_isSaving) return; // Защита от повторного сохранения
     _isSaving = true;
 
     final currentQuestionData = context.read<EditQuestionCubit>().state;
 
     // Отладочная информация
-    log('=== DEBUG SAVE ===');
-    log('Current question data: ${currentQuestionData.toJson()}');
-    log(
-      'Question text items count: ${currentQuestionData.question.textItems.length}',
-    );
-    log(
-      'Answer text items count: ${currentQuestionData.answer.textItems.length}',
-    );
-    log('Question image: ${currentQuestionData.question.image != null}');
-    log('Answer image: ${currentQuestionData.answer.image != null}');
-
     final questionEntity = widget.tempChild;
     final updatedQuestionEntity = questionEntity.copyWithQuestion(
       questionData: currentQuestionData,
     );
 
-    log('Updated question entity: ${updatedQuestionEntity.toMap()}');
-    log('Original question entity: ${widget.tempChild.toMap()}');
-
     context.read<GameStructureBloc>().add(
       QuestionEdit(updatedQuestionEntity, widget.tempChild),
     );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Данные сохранены'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 1),
-      ),
-    );
-
-    // Сбрасываем флаг через секунду
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          _isSaving = false;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+          const SnackBar(
+            content: Text('Данные сохранены'),
+            backgroundColor: Colors.green,
+            duration: Duration(milliseconds: 500),
+          ),
+        )
+        .closed
+        .then((_) {
+          if (mounted) {
+            setState(() {
+              _isSaving = false;
+            });
+            Navigator.of(context).pop();
+          }
         });
-      }
-    });
   }
 
   @override
@@ -114,7 +100,7 @@ class _EditQuestionContentState extends State<_EditQuestionContent>
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: _onSaveAndGoBack,
                 ),
                 Expanded(
                   child: TabBar(
@@ -127,14 +113,6 @@ class _EditQuestionContentState extends State<_EditQuestionContent>
                     unselectedLabelColor: Colors.white70,
                     indicatorColor: Colors.white,
                   ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.save,
-                    color: _isSaving ? Colors.grey : Colors.white,
-                  ),
-                  onPressed: _isSaving ? null : _onSave,
-                  tooltip: 'Сохранить',
                 ),
               ],
             ),
