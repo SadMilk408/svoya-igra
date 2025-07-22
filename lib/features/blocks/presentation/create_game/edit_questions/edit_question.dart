@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smartest_man/features/blocks/data/repositories/bloc/structure_bloc.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/movable_resizable_text_data.dart';
+import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/movable_resizable_image_data.dart';
+import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/audio_player_data.dart';
+import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/movable_resizable_video_data.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/structure_entity.dart';
 import 'package:smartest_man/features/blocks/presentation/create_game/edit_questions/widgets/video_picker_widget.dart';
 import 'edit_question_cubit.dart';
@@ -12,6 +15,10 @@ import 'widgets/movable_resizable_video.dart';
 import 'widgets/movable_resizable_image.dart';
 import 'widgets/movable_resizable_audio.dart';
 import 'widgets/audio_picker_widget.dart';
+import 'package:flutter/foundation.dart';
+import 'widgets/web_image_picker.dart';
+import 'widgets/web_audio_picker.dart';
+import 'widgets/web_video_picker.dart';
 
 class EditQuestion extends StatelessWidget {
   const EditQuestion({super.key, required this.tempChild});
@@ -347,32 +354,83 @@ class _EditQuestionTabAreaState extends State<EditQuestionTabArea> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   if (_isImageAdded)
-                    ImagePickerWidget(
-                      isAnswer: widget.isAnswer,
-                      onImageAdded: () {
-                        setState(() {
-                          _isImageAdded = false;
-                        });
-                      },
-                    ),
+                    kIsWeb
+                        ? WebImagePicker(
+                          onSelected: (assetPath) {
+                            context.read<EditQuestionCubit>().setImage(
+                              MovableResizableImageData(
+                                imagePath: assetPath,
+                                size: 300,
+                                position: const Offset(100, 100),
+                              ),
+                              isAnswer: widget.isAnswer,
+                            );
+                            setState(() {
+                              _isImageAdded = false;
+                            });
+                          },
+                        )
+                        : ImagePickerWidget(
+                          isAnswer: widget.isAnswer,
+                          onImageAdded: () {
+                            setState(() {
+                              _isImageAdded = false;
+                            });
+                          },
+                        ),
                   if (_isVideoAdded)
-                    VideoPickerWidget(
-                      isAnswer: widget.isAnswer,
-                      onVideoAdded: () {
-                        setState(() {
-                          _isVideoAdded = false;
-                        });
-                      },
-                    ),
+                    kIsWeb
+                        ? WebVideoPicker(
+                          onSelected: (assetPath) {
+                            context.read<EditQuestionCubit>().setVideo(
+                              MovableResizableVideoData(
+                                videoPath: assetPath,
+                                size: 300,
+                                position: const Offset(100, 100),
+                                startPosition: Duration.zero,
+                                endPosition: const Duration(seconds: 10),
+                              ),
+                              isAnswer: widget.isAnswer,
+                            );
+                            setState(() {
+                              _isVideoAdded = false;
+                            });
+                          },
+                        )
+                        : VideoPickerWidget(
+                          isAnswer: widget.isAnswer,
+                          onVideoAdded: () {
+                            setState(() {
+                              _isVideoAdded = false;
+                            });
+                          },
+                        ),
                   if (_isAudioAdded)
-                    AudioPickerWidget(
-                      isAnswer: widget.isAnswer,
-                      onAudioAdded: () {
-                        setState(() {
-                          _isAudioAdded = false;
-                        });
-                      },
-                    ),
+                    kIsWeb
+                        ? WebAudioPicker(
+                          onSelected: (assetPath) {
+                            context.read<EditQuestionCubit>().setAudio(
+                              AudioPlayerData(
+                                audioPath: assetPath,
+                                startPosition: Duration.zero,
+                                endPosition: const Duration(minutes: 1),
+                                position: const Offset(100, 100),
+                              ),
+                              isAnswer: widget.isAnswer,
+                            );
+                            setState(() {
+                              _isAudioAdded = false;
+                            });
+                          },
+                        )
+                        : AudioPickerWidget(
+                          isAnswer: widget.isAnswer,
+                          onAudioAdded: () {
+                            setState(() {
+                              _isAudioAdded = false;
+                            });
+                          },
+                        ),
                 ],
               ),
             ],

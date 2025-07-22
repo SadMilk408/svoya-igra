@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/audio_player_data.dart';
+import 'package:flutter/foundation.dart';
 
 class MovableResizableAudioWidget extends StatefulWidget {
   final AudioPlayerData data;
@@ -45,9 +46,12 @@ class _MovableResizableAudioWidgetState
 
   Future<void> _initializePlayer() async {
     try {
-      if (widget.data.audioPath.isNotEmpty &&
-          File(widget.data.audioPath).existsSync()) {
-        await _player.setFilePath(widget.data.audioPath);
+      if (widget.data.audioPath.isNotEmpty) {
+        if (kIsWeb && widget.data.audioPath.startsWith('assets/')) {
+          await _player.setAsset(widget.data.audioPath);
+        } else if (File(widget.data.audioPath).existsSync()) {
+          await _player.setFilePath(widget.data.audioPath);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -259,13 +263,21 @@ class _AudioSettingsDialogState extends State<AudioSettingsDialog> {
 
   Future<void> _loadAudioDuration() async {
     try {
-      if (widget.data.audioPath.isNotEmpty &&
-          File(widget.data.audioPath).existsSync()) {
+      if (widget.data.audioPath.isNotEmpty) {
         final player = AudioPlayer();
-        await player.setFilePath(widget.data.audioPath);
+
+        if (kIsWeb && widget.data.audioPath.startsWith('assets/')) {
+          await player.setAsset(widget.data.audioPath);
+        } else if (File(widget.data.audioPath).existsSync()) {
+          await player.setFilePath(widget.data.audioPath);
+        }
+
+        await player.setAsset(widget.data.audioPath);
+
         setState(() {
           _audioDuration = player.duration;
         });
+
         await player.dispose();
       }
     } catch (e) {

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/movable_resizable_video_data.dart';
+import 'package:flutter/foundation.dart';
 
 class MovableResizableVideoWidget extends StatefulWidget {
   final MovableResizableVideoData data;
@@ -51,7 +52,11 @@ class _MovableResizableVideoWidgetState
 
   Future<void> _initializeController() async {
     try {
-      _controller = VideoPlayerController.file(File(widget.data.videoPath));
+      if (kIsWeb && widget.data.videoPath.startsWith('assets/')) {
+        _controller = VideoPlayerController.asset(widget.data.videoPath);
+      } else {
+        _controller = VideoPlayerController.file(File(widget.data.videoPath));
+      }
       await _controller!.initialize();
       await _controller!.seekTo(widget.data.startPosition);
       _controller!.addListener(_onVideoProgress);
@@ -574,12 +579,17 @@ class _MovableResizableVideoWidgetState
                 _controller != null && _controller!.value.isInitialized
                     ? GestureDetector(
                       onTap: _playVideo,
-                      child: SizedBox(
+                      child: Container(
+                        color: Colors.red,
                         width: double.infinity,
                         height: double.infinity,
                         child: Stack(
                           children: [
-                            Positioned.fill(child: VideoPlayer(_controller!)),
+                            Positioned.fill(
+                              child: IgnorePointer(
+                                child: VideoPlayer(_controller!),
+                              ),
+                            ),
                             // Прогресс-бар поверх видео
                             Positioned(
                               bottom: 0,

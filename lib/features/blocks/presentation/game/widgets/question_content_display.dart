@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/question_data.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/movable_resizable_text_data.dart';
 import 'package:smartest_man/features/blocks/data/repositories/entities/question_data/movable_resizable_image_data.dart';
@@ -71,13 +72,23 @@ class QuestionContentDisplay extends StatelessWidget {
 
   Widget _buildImage(MovableResizableImageData imageData) {
     if (imageData.imagePath.isNotEmpty) {
-      return Image.file(
-        File(imageData.imagePath),
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          return _buildErrorWidget('Ошибка загрузки изображения');
-        },
-      );
+      if (kIsWeb && imageData.imagePath.startsWith('assets/')) {
+        return Image.asset(
+          imageData.imagePath,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildErrorWidget('Ошибка загрузки изображения');
+          },
+        );
+      } else {
+        return Image.file(
+          File(imageData.imagePath),
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildErrorWidget('Ошибка загрузки изображения');
+          },
+        );
+      }
     } else {
       return _buildErrorWidget('Файл изображения не найден');
     }

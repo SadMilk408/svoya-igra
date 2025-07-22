@@ -44,4 +44,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-/assets/
+# Игнорировать ассеты (медиа-файлы, которые не должны попадать в репозиторий)
+assets/
